@@ -1,0 +1,60 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["filterJson"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+model User {
+  id        Int        @id @default(autoincrement())
+  email     String     @unique
+  password  String     @unique
+  // age       DateTime
+  role      Role       @default(USER)
+  createAt  DateTime   @default(now()) @map("create_at")
+  updateAt  DateTime   @updatedAt @map("update_at")
+  portFolio PortFolio?
+
+  @@map("user")
+}
+
+model PortFolio {
+  id          Int      @id @default(autoincrement())
+  slug        String   @unique
+  userId      Int      @unique @map("user_id")
+  user        User     @relation(fields: [userId], references: [id])
+  fristName   String   @map("frist_name")
+  lastName    String   @map("last_name")
+  avatarUrl   String?  @map("avatar_url")
+  education   String?
+  mainContent String?  @map("main_content")
+  contact     Contact?
+
+  @@map("port_folio")
+}
+
+model Contact {
+  id          Int       @id @default(autoincrement())
+  portfolio   PortFolio @relation(fields: [portFolioId], references: [id])
+  portFolioId Int       @unique @map("port_folio_id")
+  line        String?
+  facebook    String?
+  email       String?
+  ig          String?
+  twitter     String?
+  linkin      String?
+  website     String?
+
+  @@map("contact")
+}
